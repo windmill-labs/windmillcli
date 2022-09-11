@@ -1,0 +1,15 @@
+{
+  "workspace_id": "quichotte",
+  "path": "u/don/demodb",
+  "value": {
+    "host": "demodb.example.com",
+    "port": "6543",
+    "user": "postgres",
+    "dbname": "demodb",
+    "sslmode": "disable",
+    "password": "demodb"
+  },
+  "description": "demodb",
+  "resource_type": "postgresql",
+  "extra_perms": {}
+}
