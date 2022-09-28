@@ -2,13 +2,15 @@ import {
   bold,
   dotEnv,
   downloadWorkspace,
+  ensureFile,
   handleResourceTypeUpload,
   handleResourceUpload,
   handleScriptUpload,
   importResourceTypesFromHub,
+  jobsHandler,
   parse,
   walk,
-  wmill,
+  wmill
 } from "./deps.ts";
 import { displayHelpAndQuit } from "./error.ts";
 
@@ -19,14 +21,13 @@ const scriptsPrefix = `${workspace}/scripts/`;
 const resourcesPrefix = `${workspace}/resources/`;
 const resourceTypesPrefix = `${workspace}/resource_types/`;
 
-if (import.meta.main) {
-  const { args } = Deno;
-  const parsedArgs = parse(args);
-  const config = await dotEnv({ export: true });
-  console.log(`Env is ${JSON.stringify(config)}`);
+const CONFIG_PATH = "~/.config/windmill/config.env";
 
-  // Stop conditions
-  if (args.length === 0 || parsedArgs.h || parsedArgs.help) {
+async function parseConfigs() {
+  const parsedArgs = parse(Deno.args);
+  const config = await dotEnv({ export: true });
+  ensureFile(CONFIG_PATH);
+  if (Deno.args.length == 0 || parsedArgs.h || parsedArgs.help) {
     displayHelpAndQuit();
   }
 
@@ -45,12 +46,15 @@ if (import.meta.main) {
   }
 
   console.log("Parsed args:", parsedArgs);
+  return parsedArgs;
+}
 
+if (import.meta.main) {
+  const parsedArgs = await parseConfigs();
   const wmConf = wmill.createConf();
   // TODO: Ask Ruben about extracting the config to params
   wmConf.baseServer.url = `${parsedArgs["base-url"]}`;
   wmConf.authMethods.bearerAuth.tokenProvider.token = parsedArgs.token;
-
   // ---
   if (parsedArgs["sync-rts"]) {
     if (parsedArgs.pull || parsedArgs.push) {
@@ -64,8 +68,8 @@ if (import.meta.main) {
       parsedArgs["base-url"],
     );
     console.log(bold(`Resource Types imported: ${createdResources}`));
-  
-  
+  } else if (parsedArgs.runs || parsedArgs._.includes("runs")) {
+    await jobsHandler(wmConf, parsedArgs);
   } else if (parsedArgs.pull) {
     if (parsedArgs.push || parsedArgs["sync-rts"]) {
       displayHelpAndQuit(
@@ -73,8 +77,6 @@ if (import.meta.main) {
       );
     }
     await downloadWorkspace(wmConf);
-
-
   } else if (parsedArgs.push) {
     if (parsedArgs.pull || parsedArgs["sync-rts"]) {
       displayHelpAndQuit(

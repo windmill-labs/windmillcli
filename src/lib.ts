@@ -1,10 +1,31 @@
-import { bold, CreateResource, ensureFile, wmill } from "./deps.ts";
-
+import { bold, CreateResource, ensureFile, green, red, wmill } from "./deps.ts";
+import { displayJobsHelpAndQuit } from "./error.ts";
 const workspace = "starter";
 const flowsPrefix = `${workspace}/flows/`;
 const scriptsPrefix = `${workspace}/scripts/`;
 const resourcesPrefix = `${workspace}/resources/`;
 const resourceTypesPrefix = `${workspace}/resource_types/`;
+
+export async function jobsHandler(wmConf, args?) {
+  if (args.length == 0 || !args.n) {
+    displayJobsHelpAndQuit();
+  }
+  console.log("Jobs handler!");
+  const jobApi = new wmill.JobApi(wmConf);
+  let seen = 0;
+  const jobs = await jobApi.listJobs(workspace);
+  for (const job of jobs) {
+    if (args && args.n && seen < args.n) {
+      console.log(
+        (job.success ? `${green("Success")}` : `${red("Failure")}`) +
+          ` ${bold(job.id)} ${job.scriptPath}`,
+      );
+      seen++;
+    } else {
+      return jobs.slice(0, seen - 1);
+    }
+  }
+}
 
 export async function downloadWorkspace(wmConf) {
   console.log(bold("Pulling scripts from remote"));

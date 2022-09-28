@@ -1,6 +1,15 @@
 // Importing colors
 import { bold, cyan, red } from "./deps.ts";
 
+export function displayJobsHelpAndQuit(error?: string) {
+  if (error) {
+    console.log(red(error));
+  }
+  console.log(bold("Usage:"));
+  console.log("  wm jobs [options]");
+  console.log("    -n    Limit the number of jobs to display")
+}
+
 // Shows help text, error message(if present) and exits the program
 export const displayHelpAndQuit = (error?: string): void => {
   if (error) {

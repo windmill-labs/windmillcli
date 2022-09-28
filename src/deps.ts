@@ -1,5 +1,5 @@
 export { config as dotEnv } from "https://deno.land/std@0.152.0/dotenv/mod.ts";
-export { parse, type Args } from "https://deno.land/std@0.152.0/flags/mod.ts";
+export { parse type Args } from "https://deno.land/std@0.152.0/flags/mod.ts";
 export {
   bold,
   cyan,
@@ -16,6 +16,7 @@ export {
 export { main as importResourceTypesFromHub } from "https://hub.windmill.dev/raw/190/import_resource_types_from_the_hub_windmill.ts";
 export {
   downloadWorkspace,
+  jobsHandler,
   handleResourceTypeUpload,
   handleResourceUpload,
   handleScriptUpload
