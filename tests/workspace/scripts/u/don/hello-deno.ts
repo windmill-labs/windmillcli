@@ -6,5 +6,5 @@ export async function main(name: string = "Don Quichotte") {
   console.log(
     `The env variable at \`g/all/pretty_secret\`: ${remote_variable}`,
   );
-  return { "lenssz": name.length, "splitted": name.split(" ") };
+  return { "len": name.length, "splitted": name.split(" ") };
 }
