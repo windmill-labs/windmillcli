@@ -1,4 +1,4 @@
-import { dotEnv, parse } from "./deps.ts";
+import { Args, dotEnv, parse } from "./deps.ts";
 import { displayHelpAndQuit } from "./error.ts";
 
 const CONFIG_PATH = `${Deno.env.get("HOME")}/.config/windmill/config.env`;
@@ -7,7 +7,7 @@ const CONFIG_PATH = `${Deno.env.get("HOME")}/.config/windmill/config.env`;
  * Parses configs in the following order: runtime args, envars, config file
  * @returns {Args} parsedArgs
  */
-export async function parseConfigs() {
+export async function parseConfigs(): Promise<Args> {
   const parsedArgs = parse(Deno.args);
   const config = await dotEnv({ export: true });
   const configFile = await dotEnv({ path: CONFIG_PATH });

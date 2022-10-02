@@ -1,6 +1,16 @@
 // Importing colors
 import { bold, cyan, red } from "./deps.ts";
 
+const version="0.1.0"
+
+function _printFooter() {
+  console.log()
+  console.log('Specify global configs in .env file:')
+  console.log('\t\t~/.config/windmill/config.env')
+  console.log()
+  console.log(`wmc@${version}`)
+}
+
 export function displayJobsHelpAndQuit(error?: string) {
   if (error) {
     console.log(red(error));
@@ -9,6 +19,7 @@ export function displayJobsHelpAndQuit(error?: string) {
   console.log("  wm jobs [options]");
   console.log("Options");
   console.log("    -n    Limit the number of jobs to display");
+  _printFooter();
 }
 
 // Shows help text, error message(if present) and exits the program
@@ -59,6 +70,8 @@ export const displayHelpAndQuit = (error?: string): void => {
       bold("${WM_WORKSPACE}")
     } environment variable, or ${bold("starter")} if not set`,
   );
+
+  _printFooter();
 
   Deno.exit();
 };
