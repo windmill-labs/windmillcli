@@ -1,3 +1,4 @@
+import { InlineObject15 } from "https://deno.land/x/windmill@v1.34.0/windmill-api/index.ts";
 import { bold, CreateResource, walk, wmill } from "../deps.ts";
 
 // TODO: Implement flow upload
@@ -60,9 +61,9 @@ export async function handleScriptUpload(
 ) {
   const scriptApi = new wmill.ScriptApi(wmClientConfig);
   const scriptContent = await Deno.readTextFile(fileName);
+  const workspace = wmClientConfig.workspace_id;
   const scriptPath = fileName.slice(`${workspace}/scripts/`.length, -3);
   const language = fileName.endsWith(".ts") ? "deno" : "python3";
-  const workspace = wmClientConfig.workspace_id;
   let summary = "";
   let description = "";
   let isTemplate = null;
@@ -84,8 +85,7 @@ export async function handleScriptUpload(
     if (err instanceof Deno.errors.NotFound) {
       console.log("No metadata found");
     } else {
-      console.log(`Something went wrong trying to read file: ${err}`);
-      return undefined;
+      throw Error("Something went wrong trying to read file");
     }
   }
 
@@ -135,7 +135,7 @@ export async function handleScriptUpload(
         try {
           const createScriptResponse = await scriptApi.createScript(
             workspace,
-            newMetadata,
+            newMetadata as InlineObject15,
           );
           console.log(
             `Script updated. New version hash: ${createScriptResponse}`,
@@ -147,11 +147,13 @@ export async function handleScriptUpload(
         }
       } else {
         console.log(
-          `  Script content changed, updating script ${fileName}`,
+          `Script content changed, updating script ${fileName}`,
         );
         if (language == "deno") {
           schema = await scriptApi.denoToJsonschema(scriptContent);
-        } else schema = await scriptApi.pythonToJsonschema(scriptContent);
+        } else {
+          schema = await scriptApi.pythonToJsonschema(scriptContent);
+        }
         const newMetadata = oldScript;
         newMetadata.content = scriptContent;
         newMetadata.schema = schema;
@@ -168,7 +170,7 @@ export async function handleScriptUpload(
   } catch (err) {
     if (err?.code == 404) {
       console.log(
-        `  Script ${scriptPath} does not exist. Uploading as new.`,
+        `Script ${scriptPath} does not exist. Uploading as new.`,
       );
     } else {
       console.log(`Something went terribly wrong:${err}`);
@@ -202,6 +204,7 @@ export async function handleResourceUpload(
   fileName: string,
   wmClientConfig,
 ) {
+  const workspace = wmClientConfig.workspace_id;
   const resourceApi = new wmill.ResourceApi(wmClientConfig);
   const resourcePath: string = fileName.slice(
     `${workspace}/resources/`.length,
@@ -210,7 +213,6 @@ export async function handleResourceUpload(
   const newResource = JSON.parse(
     await Deno.readTextFile(fileName),
   );
-  const workspace = wmClientConfig.workspace_id;
   console.log(`\nProcessing resource: ${resourcePath} at ${fileName}`);
   try {
     const oldResource = await resourceApi.getResource(

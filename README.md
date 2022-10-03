@@ -1,10 +1,10 @@
-# windmilll-cli
+# windmill-cli
 
 ## Todo
 
 - [x] Add read from .env
-- [ ] Write push command
-- [ ] Write pull command
+- [x] Write push command
+- [x] Write pull command
 
 ## Build
 
